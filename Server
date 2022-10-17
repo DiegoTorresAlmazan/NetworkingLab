@@ -1,0 +1,42 @@
+package edu.sdccd.cisc191;
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Server{
+    public static final int PORT = 5055;//Create a PORT
+
+    public static void main(String[] args) throws Exception {
+        //Creates and initializes a new Server
+        new Server();
+    }
+    Server() throws Exception{
+        //Create a new Server Socket
+        ServerSocket serverSocket = new ServerSocket(PORT);
+        //Create a socket so that the Server can be accepted
+        Socket socket = serverSocket.accept();
+
+        //Confirmation that Client is connected
+        System.out.println("Client connected");
+
+        //Create I/O streams so that data is able to be sent and received
+        ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+        ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+
+        //Reads objects from our input stream and makes it a new request
+        VehicleRequest receiveRequest = (VehicleRequest)inputStream.readObject();
+        //Confirmation message
+        System.out.println("The vehicle request has been received.");
+        //Will print out client's request
+        System.out.println(receiveRequest.message);
+
+        //Generates response objects
+        VehicleResponse vehicleResponse = new VehicleResponse(receiveRequest, 10000, 17000, 4, 2,
+                new String[]{"Manual" , "Automatic"});
+        outputStream.writeObject(vehicleResponse);
+        outputStream.flush();
+
+        serverSocket.close();
+    }
+}
